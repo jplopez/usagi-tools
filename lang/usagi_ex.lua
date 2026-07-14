@@ -50,8 +50,6 @@ function util.normalize2_as_vec(dx, dy)
     return { x = dx / len, y = dy / len }
 end
 
-
----
 ---Returns the direction values (-1,0,1) for `dx` and `dy` as separate values 
 ---
 ---For each input:
@@ -69,7 +67,6 @@ function util.get_direction_values(dx, dy)
            (dy > 0 and 1 or dy < 0 and -1 or 0)
 end
 
----
 ---Returns the direction values (-1,0,1) for `dx` and `dy` as {x,y} table
 ---
 ---This method uses `util.get_direction_values` to calculate the values
@@ -87,10 +84,12 @@ function util.vec_to_direction(dx, dy)
   return {x = _x, y = _y }
 end
 
-function util.sprintf(s, ...)
-    print(string.format(s, ...))
-end
 
 function util.vec_in_screen(x, y)
     return x >= 0 and x <= usagi.GAME_W and y >=0 and y <= usagi.GAME_H
+end
+
+-- wrapper for `print(string.format(s))` 
+function util.sprintf(s, ...)
+    print(string.format(s, ...))
 end

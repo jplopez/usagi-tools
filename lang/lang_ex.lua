@@ -1,6 +1,4 @@
 --- Lua Language Extension
-
-
 local Assert = {}
 Assert.__index = Assert
 
@@ -61,8 +59,6 @@ function Within(value, min_value, max_value, inclusive)
       return v > min_value and v < max_value
     end)
 end
-
-
 
 Assert.Iz = {
   Falsy = Falsy,
