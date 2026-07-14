@@ -21,9 +21,7 @@
 --- Each sampler receives different initial parameters at construction:
 --- 
 --- Both functions receive the same input parameters. 
-
-
-require("mod.usagi_ex")
+require("lang.usagi_ex")
 local PointBuffer = require("mod.pointbuffer")
 
 
@@ -53,19 +51,13 @@ RaySampler.INFINITE    = math.maxinteger
 ---| 0 -- no direction
 ---| 1 -- right or down
 
-local function _calc_max_dist_sq(max_dist)
-    return max_dist and max_dist*max_dist or 
-          usagi.GAME_W * usagi.GAME_W + usagi.GAME_H * usagi.GAME_H
-end
-
-
 
 ------------------------
 --- Line Sampler
 ------------------------
 
 
----Returns a point sampler that uses a single straight line
+---Sampler to cast a single straight line. Optionally, with a given distance (max_dist), otherwise until the edge of the game screen 
 ---
 ---@param buffer? PointBuffer -- optional PointBuffer with the strategy to store and sort the sampled points. Default is flat array
 ---@return RaySampler
@@ -109,8 +101,7 @@ end
 --- Circle Sampler
 ----------------------
 
-
----Returns a point sampler using concentric lines.
+---Sampler to cast multiples concentric lines within a given arc and separation between lines (step).
 ---
 ---Calling this function w/o parameters, casts a full circle of 36 concentric stright lines with length == GAME_H
 ---
@@ -183,12 +174,21 @@ function RaySampler:circle_sampler(r, arc, step, buffer)
   return sampler
 end
 
+---Special variation of circle sampler for an arc that goes through the screen
+---@param arc number -- specifies the arc from the circle to cast.
+---@param step? number -- the separation in degrees between each casted line. Default is 10
+---@param buffer? PointBuffer -- optional PointBuffer with the strategy to store and sort the sampled points. Default is flat array
+---@return RaySampler
+function RaySampler:arc_sampler(arc, step, buffer)
+  assert(arc and arc > 0, "Arc Sampler: 'arc' is required between 1 and 360")
+  return self:circle_sampler(RaySampler.SCREEN_DIST, arc, step, buffer)
+end
 
 ---------------------
 --- Grid Sampler
 --------------------
-
----comment
+---Sanpler to cast multiple lines horizontally, vertically or both, with a given `length` and `spacing` between the lines
+---
 ---@param rows? integer -- number of horizontal lines of the grid. Set to zero if you only want vertical lines. Default: 4
 ---@param cols? integer -- number of vertical lines of the grid. Set to zero if you only want horizontal lines. Default: 4
 ---@param spacing? integer -- number of pixels in between casted lines. Must be > 0. Default: 4
@@ -256,7 +256,7 @@ function RaySampler:grid_sampler(rows, cols, spacing, length, buffer)
     local r, r_step = 0, 1
     local c, c_step = 0, 1
     local _ox, _oy = ox, oy
-    local d = 0
+    local d = 0 -- index counter
 
     return function()
       while (r < r_end) do

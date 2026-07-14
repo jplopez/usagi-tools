@@ -1,6 +1,5 @@
 ---RaycastHit : Object to represent a possitive hit from a Raycast
-
-local _ require("mod.usagi_ex")
+local _ require("lang.usagi_ex")
 
 ---@class RaycastHit
 ---@field collider Collider | table | boolean | nil
@@ -30,6 +29,5 @@ function RaycastHit.new(origin, point, collider)
         direction = util.vec_to_direction(dx, dy ),
     }, RaycastHit)
 end
-
 
 return RaycastHit

@@ -1,5 +1,5 @@
 -- Ray library
-local Ray = require("ray2")
+local Ray = require("ray")
 
 
 -------------------------------
