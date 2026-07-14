@@ -1,7 +1,7 @@
-local RaycastHit = require("mod.raycasthit")
-local RaySampler = require("mod.samplers")
-local PointBuffer = require("mod.pointbuffer")
-local Collider = require("mod.colliders")
+local RaycastHit = require("raycast.raycasthit")
+local RaySampler = require("raycast.samplers")
+local PointBuffer = require("raycast.pointbuffer")
+local Collider = require("raycast.colliders")
 
 ---@class Raycast2D
 local Raycast = {
@@ -147,7 +147,7 @@ function Raycast.cast(ox, oy, dx, dy, sampler, hit_condition, exit_condition)
         hits[#hits+1] = hit
         if exit_condition(hit)then break end
       end
-    
+
     end
   end
   return hits

@@ -2,6 +2,25 @@
 --  Usagi Extensions
 -------------------------
 
+---@alias Color
+---| 0  -- COLOR_TRUE_WHITE
+---| 1  -- COLOR_BLACK
+---| 2  -- COLOR_DARK_BLUE
+---| 3  -- COLOR_DARK_PURPLE
+---| 4  -- COLOR_DARK_GREEN
+---| 5  -- COLOR_BROWN
+---| 6  -- COLOR_DARK_GRAY
+---| 7  -- COLOR_LIGHT_GRAY
+---| 8  -- COLOR_WHITE
+---| 9  -- COLOR_RED
+---| 10 -- COLOR_ORANGE
+---| 11 -- COLOR_YELLOW
+---| 12 -- COLOR_GREEN
+---| 13 -- COLOR_BLUE
+---| 14 -- COLOR_INDIGO
+---| 15 -- COLOR_PINK
+---| 16 -- COLOR_PEACH
+
 ---@class Usagi
 local usagi = usagi
 

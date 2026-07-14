@@ -1,9 +1,5 @@
 local Ray = require('ray')
-local RaySampler = require("mod.samplers")
-local colliders = require("mod.colliders")
-local Collider = colliders.Collider
-local ColliderRegistry = colliders.ColliderRegistry
-local HitStrategy = require("mod.hitstrategy")
+local RaySampler = require("raycast.samplers")
 
 __debug = false
 

@@ -34,9 +34,9 @@ function Scene:update(dt) end
 function Scene:draw(dt) end
 
 -- Scenes
-local RayTestScene = require("raytest_scene")
-local MissileScene = require("missile_scene")
-local Stealth = require("stealth")
+local RayTestScene = require "scenes.raytest"
+local MissileGameScene = require "scenes.missile_game"
+local StealthGameScene = require "scenes.stealth_game"
 
 
 -- SCENE MANAGEMENT
@@ -73,26 +73,12 @@ function _init()
     ---@type Scene
     CurrentScene = nil,
 
-    CurrentState = 0,
-
     Scenes = {
       test = RayTestScene,
       ---@type Scene | metatable
-      missile = MissileScene,
-      ---@type Scene | metatable
-      stealth = Stealth:new({}),
+      stealth = StealthGameScene,
     },
 
-    SceneType = {
-      StartScene   = 10,
-      ExampleScene = 20,
-    },
-
-    GameStates = {
-      Stopped  = 100,
-      Playing  = 200,
-      Gameover = 300
-    }
   }
 
   -- register example games as menu items

@@ -22,7 +22,7 @@
 --- 
 --- Both functions receive the same input parameters. 
 require("lang.usagi_ex")
-local PointBuffer = require("mod.pointbuffer")
+local PointBuffer = require("raycast.pointbuffer")
 
 
 ---A ray sampler that collects points based on origin, normalized direction, and params, and returns a list of sample points.

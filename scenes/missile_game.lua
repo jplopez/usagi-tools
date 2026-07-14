@@ -1,6 +1,11 @@
 ---Missile Scene: Scene for the missile game
 
-local Ray = require("ray")
+local Ray = require "ray"
+local RaySampler = require("raycast.samplers")
+local colliders = require("raycast.colliders")
+local Collider = colliders.Collider
+local ColliderRegistry = colliders.ColliderRegistry
+local HitStrategy = require("raycast.hitstrategy")
 
 
 ------------------------
@@ -42,8 +47,8 @@ local building_colors = { gfx.COLOR_WHITE, gfx.COLOR_DARK_GRAY, gfx.COLOR_GREEN,
 -- MissileScene Definition
 -----------------------
 
----@class MissileScene : Scene
-local MissileScene = {
+---@class MissileGameScene : Scene
+local MissileGameScene = {
   name = "missile",
   active = false,
 
@@ -75,7 +80,7 @@ local MissileScene = {
   miss_count = 0,
 
 }
-MissileScene.__index = MissileScene
+MissileGameScene.__index = MissileGameScene
 
 
 -------------------------
@@ -83,7 +88,7 @@ MissileScene.__index = MissileScene
 -------------------------
 
 --- Resets missiles and buildings, and adds State.Missile 
-function MissileScene:load()
+function MissileGameScene:load()
 
   -- game states
   State.Missile = {
@@ -116,14 +121,14 @@ function MissileScene:load()
   self.active = true
 end
 
-function MissileScene:unload()
+function MissileGameScene:unload()
   self.active = false
 end
 
 ---Spawn and moves missiles, updates player position, and checks inputs to detect hit missiles.
 ---If any missiles are hit, removes them from the list
 ---@param dt number -- delta time 
-function MissileScene:update(dt)
+function MissileGameScene:update(dt)
 
 
   print("State: " .. State.CurrentState)
@@ -172,7 +177,7 @@ end
 
 ---Perform the player fire
 ---@param dt any
-function MissileScene:player_fire(dt)
+function MissileGameScene:player_fire(dt)
   -- still on cooldown
   if State.CurrentState == State.Missile.Shooting 
     and self.t_last_fire < self.fire_cd then return end
@@ -186,7 +191,7 @@ end
 
 ---Checks if player latest fire hit a missile 
 ---@param dt integer -- delta time
-function MissileScene:check_player_hits(dt)
+function MissileGameScene:check_player_hits(dt)
 
     -- end of shooting
     if self.t_last_fire > self.fire_rate then
@@ -199,29 +204,29 @@ function MissileScene:check_player_hits(dt)
 
     -- `circle_all` returns me all missiles hit within the radious `r`.
     -- we cast from the player position, and the hit strategy is collider with tag 'missile'
-    local hits = Ray.Raycast.circle_all(
-                  self.pos_x, self.pos_y, self.fire_r,
-                  Ray.HitStrategy.Collider.tag("missile"))  -- hit strategy : collider with tag 'missile'
-    print(usagi.dump(hits))
-    -- remove missiles and their colliders
-    for i,hit in ipairs(hits) do
-      local c = hit.collider
-      if c then
-        local m_index = c.data.index
-        table.remove(self.missiles, m_index)
-        Ray.ColliderRegistry.try_remove(c)
-      end
-    end
+    -- local hits = Ray.Raycast.circle_all(
+    --               self.pos_x, self.pos_y, self.fire_r,
+    --               Ray.HitStrategy.Collider.tag("missile"))  -- hit strategy : collider with tag 'missile'
+    -- print(usagi.dump(hits))
+    -- -- remove missiles and their colliders
+    -- for i,hit in ipairs(hits) do
+    --   local c = hit.collider
+    --   if c then
+    --     local m_index = c.data.index
+    --     table.remove(self.missiles, m_index)
+    --     Ray.ColliderRegistry.try_remove(c)
+    --   end
+    -- end
 
 end
 
 ---Check if a missile has hit a building. If so, applies damage to building
 ---@param dt integer -- delta time from update
-function MissileScene:check_missiles_hits(dt)
+function MissileGameScene:check_missiles_hits(dt)
 
 end
 
-function MissileScene:draw(dt)
+function MissileGameScene:draw(dt)
   gfx.clear(gfx.COLOR_DARK_BLUE)
 
   for i=1,#self.missiles do
@@ -248,7 +253,7 @@ end
 ---@param _w integer
 ---@param _h integer
 ---@param _c Color
-function MissileScene:create_building(_x, _y, _w, _h, _c)
+function MissileGameScene:create_building(_x, _y, _w, _h, _c)
 
     ---@type Building
     local b = {
@@ -264,17 +269,17 @@ function MissileScene:create_building(_x, _y, _w, _h, _c)
 
     self.buildings[#self.buildings+1] = b
 
-    b.col = Ray.Collider.rect(_x,_y,_w,_h, { tag = "building"})
-    Ray.ColliderRegistry.add(b.col)
+    -- b.col = Ray.Collider.rect(_x,_y,_w,_h, { tag = "building"})
+    -- Ray.ColliderRegistry.add(b.col)
 end
 
 ---Applies damage to a building
 ---@param d number --damage ammount
-function MissileScene:damage_building(d) end
+function MissileGameScene:damage_building(d) end
 
 ---Spawns a missile if the cooldown time has passed and there's room for more missiles
 ---@param dt number -- delta time from update
-function MissileScene:spawn_missile(dt)
+function MissileGameScene:spawn_missile(dt)
 
   -- update timer
   self.t_last_spawn += dt
@@ -307,8 +312,8 @@ function MissileScene:spawn_missile(dt)
 
   -- create missile collider  
   -- add the missile index reference to determine which missile this collider belongs to
-  local col = Ray.Collider.circle(m.x, m.y, m.r, {tag = "missile", index = index })
-  Ray.ColliderRegistry.add(col)
+  -- local col = Ray.Collider.circle(m.x, m.y, m.r, {tag = "missile", index = index })
+  -- Ray.ColliderRegistry.add(col)
 
   -- reset spawn cooldown
   self.t_last_spawn = 0
@@ -317,13 +322,13 @@ end
 
 ---Destroy the missiles specified in `m_array`. Also removes the Colliders from the registry
 ---@param m_array any
-function MissileScene:destroy_missiles(m_array)
+function MissileGameScene:destroy_missiles(m_array)
   if not m_array or #m_array == 0 then return end
 
-  for i,m in ipairs(m_array) do
-    Ray.ColliderRegistry.remove(m)
-    table.remove(self.missiles, m.index)
-  end
+  -- for i,m in ipairs(m_array) do
+  --   Ray.ColliderRegistry.remove(m)
+  --   table.remove(self.missiles, m.index)
+  -- end
 end
 
-return MissileScene
+return MissileGameScene
